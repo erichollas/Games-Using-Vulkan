@@ -1,0 +1,17 @@
+# StateMachine3DPong
+
+A screen capture of this game running can be found at: https://www.youtube.com/watch?v=cVegpEZbewA
+
+
+
+The shaders folder contains the shader files and the states folder contains the various states that correspond to the character objects.
+
+The character objects each inherit from the abstract BaseCharacter object so that the characters may be seemlessly managed in the CharacterManager object. Also each of the character objects contain a StateMachine<CharacterType> object to manage their states and are made to receive messages which will be handled in their respective states' onMessage() function.
+
+The AIengine and PhysicsCalculator objects are instance objects that contain the functions that calculate ai-movement and collisions, respectively.
+
+The Numbers.h and ScenicObjects.h files contain the vertex and index information for the various background objects.
+
+The main game loop (using the VulkanRenderEngine) and character initialization is all managed in the Window object as well as creating the window and the key callbacks.
+
+Finally, the main.cpp file contains the call to the main function and runs the game via a Window object, and the stdfx files are the pre-compiled header files.
