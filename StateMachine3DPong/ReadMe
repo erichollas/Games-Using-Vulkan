@@ -4,7 +4,7 @@ A screen capture of this game running can be found at: https://www.youtube.com/w
 
 
 
-The shaders folder contains the shader files and the states folder contains the various states that correspond to the character objects.
+The states folder contains the various states that correspond to the character objects.
 
 The character objects each inherit from the abstract BaseCharacter object so that the characters may be seemlessly managed in the CharacterManager object. Each of the character objects contain a StateMachine<CharacterType> object to manage their respective states. The character objects are made to receive messages sent between characters and as user input. The messages will be handled in characters respective states' onMessage() function.
 
