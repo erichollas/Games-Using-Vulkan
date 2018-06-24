@@ -1,5 +1,5 @@
 /****************************************************************************************
-* TITLE:	2D-Pong in 3D																*
+* TITLE:	VulkanRenderEngine															*
 * BY:		Eric Hollas																	*
 *																						*
 * FILE:		GeometryManager.h															*
@@ -8,7 +8,7 @@
 *				Since the Render Engine uses a dynamic uniform buffer and single		*
 *				index and vertex buffers, this manager will be used in the command		*
 *				buffer, index buffer, and vertex buffer functions in the render			*
-*				engine.	It will also manage loading and deleting the vertex and index	*	
+*				engine.	It will also manage loading and deleting the vertex and index	*
 *				data in the CharacterManager object as well.							*
 *																						*
 *****************************************************************************************/
@@ -79,11 +79,7 @@ namespace Geometry {
 		GeometryManager() {
 		}
 		~GeometryManager() {
-			vertexOffsets.~vector();
-			indexOffsets.~vector();
-			indicesPerObject.~vector();
-			indexBuffer.~vector();
-			vertexBuffer.~vector();
+			geometryInfo.~vector();
 		}
 
 		/*
@@ -99,15 +95,22 @@ namespace Geometry {
 		*
 		*/
 		void addObject(std::vector<Geometry::Vertex> vertices, std::vector<uint32_t> indices) {
-			indicesPerObject.push_back((indices.size()));
-			indexOffsets.push_back((indexBuffer.size()));
+			offset temp;
 
-			vertexOffsets.push_back(vertexBuffer.size());
+			if (geometryInfo.empty()) {
+				temp.offset_index = 0;
+				temp.offset_vertex = 0;
+				temp.indexBuffer = indices;
+				temp.vertexBuffer = vertices;
+			}
+			else {
+				temp.offset_index = geometryInfo.back().offset_index + geometryInfo.back().indexBuffer.size();
+				temp.offset_vertex = geometryInfo.back().offset_vertex + geometryInfo.back().vertexBuffer.size();
+				temp.indexBuffer = indices;
+				temp.vertexBuffer = vertices;
+			}
 
-			vertexBuffer.insert(vertexBuffer.end(), vertices.begin(), vertices.end());
-			indexBuffer.insert(indexBuffer.end(), indices.begin(), indices.end());
-
-			numOfObjects++;
+			geometryInfo.push_back(temp);
 		}
 		/*
 		* Function: deleteLast
@@ -120,66 +123,106 @@ namespace Geometry {
 		*
 		*/
 		void deleteLast() {
-			//local variables are used to run the for loops the correct number of times
-			uint32_t numVertices = vertexOffsets.back();
-			uint32_t numIndices = indicesPerObject.back();
+			geometryInfo.pop_back();
+		}
+		/*
+		* Function: updateObject
+		*
+		* Paramters: uint32_t object, 
+		*			 std::vector<Vertex> vertices, 
+		*			 std::vector<uint32_t> indices
+		*
+		* Return Type: void
+		*
+		* Description: takes the object variable and updates that objects geometric data to be the other
+		*				parameters that were passed. Then updates the offset data for the objects that
+		*				come after that object in the vector of objects. Order must be maintained to match
+		*				the order of the uniform matrices, which are not tracked here.
+		*
+		*/
+		void updateObject(uint32_t object, std::vector<Vertex> vertices, std::vector<uint32_t> indices) {
+			if (object < geometryInfo.size()) {
+				geometryInfo[object].indexBuffer.clear();
+				geometryInfo[object].vertexBuffer.clear();
+				geometryInfo[object].indexBuffer = indices;
+				geometryInfo[object].vertexBuffer = vertices;
 
-			//deletes the offsets
-			vertexOffsets.pop_back();
-			indexOffsets.pop_back();
-			indicesPerObject.pop_back();
-
-			//deletes the mesh data
-			for (uint32_t i = vertexBuffer.size(); i > numVertices; i--) {
-				vertexBuffer.pop_back();
+				while (++object < geometryInfo.size()) {
+					geometryInfo[object].offset_index = geometryInfo[object - 1].indexBuffer.size() + geometryInfo[object - 1].offset_index;
+					geometryInfo[object].offset_vertex = geometryInfo[object - 1].vertexBuffer.size() + geometryInfo[object - 1].offset_vertex;
+				}
 			}
-			for (uint32_t i = 0; i < numIndices; i++) {
-				indexBuffer.pop_back();
-			}
-
-			numOfObjects--;
 		}
 
 		/*
-		* The rest of the functions are generic accessor methods
+		* The following 8 functions are generic accessor methods, but they do compile their necessary 
+		*		before returning the data if need be.
 		*
 		*/
 		uint32_t getNumOfObjects() const {
-			return numOfObjects;
+			return geometryInfo.size();
 		}
 		uint32_t getVertexOffset(int object) const {
-			return vertexOffsets[object];
+			if (object > geometryInfo.size()) {
+				return 0;
+			}
+			return geometryInfo[object].offset_vertex;
 		}
 		uint32_t getIndexOffset(int object) const {
-			return indexOffsets[object];
+			if (object > geometryInfo.size()) {
+				return 0;
+			}
+			return geometryInfo[object].offset_index;
 		}
 		uint32_t getIndiciesInObject(int object) const {
-			return indicesPerObject[object];
+			if (object > geometryInfo.size()) {
+				return 0;
+			}
+			return geometryInfo[object].indexBuffer.size();
 		}
 
 		uint32_t getTotalVertices() const {
-			return vertexBuffer.size();
+			return (geometryInfo.back().offset_vertex + geometryInfo.back().vertexBuffer.size());
 		}
 		uint32_t getTotalIndices() const {
-			return indexBuffer.size();
+			return (geometryInfo.back().offset_index + geometryInfo.back().indexBuffer.size());
 		}
 
 		std::vector<uint32_t> getIndicies() const {
-			return indexBuffer;
+			std::vector<uint32_t> indices;
+			std::vector<offset>::const_iterator it = geometryInfo.begin();
+
+			while (it != geometryInfo.end()) {
+				offset temp = *it;
+				indices.insert(indices.end(), temp.indexBuffer.begin(), temp.indexBuffer.end());
+				it++;
+			}
+
+			return indices;
 		}
 		std::vector<Geometry::Vertex> getVertices() const {
-			return vertexBuffer;
+			std::vector<Vertex> vertices;
+			std::vector<offset>::const_iterator it = geometryInfo.begin();
+			
+			while (it != geometryInfo.end()) {
+				offset temp = *it;
+				vertices.insert(vertices.end(), temp.vertexBuffer.begin(), temp.vertexBuffer.end());
+				it++;
+			}
+			
+			return vertices;
 		}
 
 	private:
-		uint32_t numOfObjects = 0;
+		struct offset {
+			std::vector<Vertex> vertexBuffer;
+			std::vector<uint32_t> indexBuffer;
 
-		std::vector<uint32_t> vertexOffsets;
-		std::vector<uint32_t> indexOffsets;
-		std::vector<uint32_t> indicesPerObject;
+			uint32_t offset_index;
+			uint32_t offset_vertex;
+		};
 
-		std::vector<uint32_t> indexBuffer;
-		std::vector<Geometry::Vertex> vertexBuffer;
+		std::vector<offset> geometryInfo;
 
 	};
 }
