@@ -1,0 +1,11 @@
+# VulkanRenderEngine
+
+A render engine programmed using the Vulkan graphics API.
+
+The Clock.h file contains a clock used to calculate performance and can be easily posted to a window.
+The Debugger.h and Camera.h files contain the definitions for the methods and objects that define their respective objects.
+The Utilities.h and InitStructs.h files contain extraneous functions used in the RenderEngine object and an assortment of initializing structs that Vulkan requires, respectively, to cut down on code bloat within the RenderEngine.cpp.
+The Buffer.h defines a buffer with all its possible associated data and will used to implement the Vertex, Index, Uniform, and Dynamic Uniform Buffers in the Render Engine.
+The RenderEngine.h and RenderEngine.cpp files of course contain the definitions used to define the Render Engine.
+
+The GeometryManager is an object that is used to store vertices, indices, and the offset information for each objects offsets within the Vertex and Index Buffers. This will be used to instance draw each object within the buffers once in the command buffer creation within the RenderEngine.cpp file (the command buffers method is the last method defined in the RenderEngine.cpp file).
