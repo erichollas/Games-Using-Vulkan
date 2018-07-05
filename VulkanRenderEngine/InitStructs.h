@@ -1,16 +1,13 @@
-/****************************************************************************************
-* TITLE:	2D-Pong in 3D																*
-* BY:		Eric Hollas																	*
-*																						*
-* FILE:		InitStructs.h																*
-* DETAILS:	This file adds to the vkAPI namespace basic functions to initialize the 	*
-*				many generic struct objects used throughout the Vulkan API in the		*
-*				Render Engine.															*
-*																						*
-*****************************************************************************************/
-
+/*
+* TITLE:	Vulkan Render Engine
+* BY:		Eric Hollas	
+*		
+* FILE:		InitStructs.h	
+* DETAILS:	This file adds to the vkAPI namespace basic functions to initialize the 
+*				many generic struct objects used throughout the Vulkan API in the
+*				Render Engine.	
+*/
 #pragma once
-
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -111,9 +108,9 @@ namespace vkAPI {
 			info.extent = extent;
 			return info;
 		}
-		inline VkPipelineRasterizationStateCreateInfo RasterizerInfo(VkPolygonMode polyMode, 
-																	 float lineSize, 
-																	 VkFrontFace cullOrientation) {
+		inline VkPipelineRasterizationStateCreateInfo RasterizerInfo(VkPolygonMode polyMode,
+			float lineSize,
+			VkFrontFace cullOrientation) {
 			VkPipelineRasterizationStateCreateInfo info = {};
 			info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 			info.depthClampEnable = VK_FALSE;

@@ -1,21 +1,19 @@
-/****************************************************************************************
-* TITLE:	2D-Pong in 3D																*
-* BY:		Eric Hollas																	*
-*																						*
-* FILE:		Clock.h																		*
-* DETAILS:	This file defines the clock object. For the implementation of this game		*
-*				it will be used to print the frame statistics to the window title bar.	*
-*																						*
-*****************************************************************************************/
-
+/*
+* TITLE:	Vulkan Render Engine
+* BY:		Eric Hollas	
+*
+* FILE:		Clock.h	
+* DETAILS:	This file defines the clock object. For the implementation of this game	
+*				it will be used to print the frame statistics to the window title bar.
+*/
 #pragma once
 #include <time.h>
 #include <iostream>
 
 class Clock {
 public:
-	Clock(){}
-	~Clock(){}
+	Clock() {}
+	~Clock() {}
 
 	/*
 	* Function: calcFrameStats

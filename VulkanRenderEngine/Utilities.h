@@ -1,19 +1,4 @@
-/****************************************************************************************
-* TITLE:	2D-Pong in 3D																*
-* BY:		Eric Hollas																	*
-*																						*
-* FILE:		Utilites.h																	*
-* DETAILS:	This file defines most of the Utilities namespace. In this namespace are	*
-*				many functions used throughout the RenderEngine.h file to search for	*
-*				and query different hardware objects to be used in the rendering		*
-*				process. These functions were abstracted here to this file to make		*
-*				the code in the RenderEngine.cpp file more readable, as was the			*
-*				InitStructs.h file's purpose.											*
-*																						*
-*****************************************************************************************/
-
 #pragma once
-
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -27,7 +12,6 @@
 
 
 namespace Utilities {
-
 	const std::vector<const char*> validationLayers = {
 		"VK_LAYER_LUNARG_standard_validation"
 	};
@@ -159,17 +143,22 @@ namespace Utilities {
 	*				memory we want for the buffers (index and vertex buffers)
 	*
 	*/
-	inline uint32_t findMemoryType(VkPhysicalDevice physDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) {
-		VkPhysicalDeviceMemoryProperties memProperties;
-		vkGetPhysicalDeviceMemoryProperties(physDevice, &memProperties);
+	inline uint32_t findMemoryType(VkPhysicalDevice physDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) throw(Exception) {
+		try {
+			VkPhysicalDeviceMemoryProperties memProperties;
+			vkGetPhysicalDeviceMemoryProperties(physDevice, &memProperties);
 
-		for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-			if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
-				return i;
+			for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+				if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+					return i;
+				}
 			}
-		}
 
-		throw std::runtime_error("failed to find suitable memory type!");
+			throw Exception("failed to find suitable memory type", "Utilities.h", "findMemoryType");
+		}
+		catch (Exception &excpt) {
+			throw excpt;
+		}
 	}
 
 	/*
@@ -181,7 +170,7 @@ namespace Utilities {
 	*
 	* Description: to be called from isDeviceSuitable
 	*				enumerates the extensions supported by the device parameter
-	*				to search for the required extensions, returns true if 
+	*				to search for the required extensions, returns true if
 	*				the required extensions are supported, otherwise returns false
 	*
 	*/
@@ -209,7 +198,7 @@ namespace Utilities {
 	*
 	* Return Type: bool
 	*
-	* Description: Determines if the physical device parameter supports the 
+	* Description: Determines if the physical device parameter supports the
 	*				required extensions to be able to present rendered images
 	*				directly to the surface through the use of a swapchain
 	*				returns true if the device is suitable, flase otherwise
@@ -237,8 +226,8 @@ namespace Utilities {
 	*
 	* Return Type: VkSurfaceFormatKHR
 	*
-	* Description: checks if the swapchain surface supports the format for the color 
-	*				space we want most, otherwise returns the format that fits the 
+	* Description: checks if the swapchain surface supports the format for the color
+	*				space we want most, otherwise returns the format that fits the
 	*				best case we define in the function
 	*
 	*/
@@ -266,7 +255,7 @@ namespace Utilities {
 	* Description: picks one of the four presentation modes for the swapchain
 	*				VK_PRESENT_MODE_MAILBOX_KHR is our first choice
 	*				VK_PRESENT_MODE_IMMEDIATE_KHR is our second
-	*				and VK_PRESENT_MODE_FIFO_KHR is guaranteed to be available 
+	*				and VK_PRESENT_MODE_FIFO_KHR is guaranteed to be available
 	*				and our third choice
 	*
 	*/
@@ -319,9 +308,9 @@ namespace Utilities {
 	/*
 	* Function: findSupportedFormat
 	*
-	* Paramters:		VkPhysicalDevice dvc, 
-	*			 const	std::vector<VkFormat> &candidates, 
-	*					VkImageTiling tiling, 
+	* Paramters:		VkPhysicalDevice dvc,
+	*			 const	std::vector<VkFormat> &candidates,
+	*					VkImageTiling tiling,
 	*					VkFormatFeatureFlags features
 	*
 	* Return Type: VkFormat
@@ -329,21 +318,26 @@ namespace Utilities {
 	* Description: searches for the best possible format we will use for the depth buffer
 	*
 	*/
-	inline VkFormat findSupportedFormat(VkPhysicalDevice dvc, 
-										const std::vector<VkFormat> &candidates, 
-										VkImageTiling tiling, 
-										VkFormatFeatureFlags features) {
-		for (VkFormat format : candidates) {
-			VkFormatProperties props;
-			vkGetPhysicalDeviceFormatProperties(dvc, format, &props);
-			if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
-				return format;
+	inline VkFormat findSupportedFormat(VkPhysicalDevice dvc,
+										const std::vector<VkFormat> &candidates,
+										VkImageTiling tiling,
+										VkFormatFeatureFlags features) throw(Exception) {
+		try {
+			for (VkFormat format : candidates) {
+				VkFormatProperties props;
+				vkGetPhysicalDeviceFormatProperties(dvc, format, &props);
+				if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
+					return format;
+				}
+				else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
+					return format;
+				}
 			}
-			else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
-				return format;
-			}
+			throw Exception("failed to find supported format", "Utilities.h", "findSupportedFormat");
 		}
-		throw std::runtime_error("failed to find supported format!");
+		catch (Exception &excpt) {
+			throw excpt;
+		}
 	}
 
 	/*
@@ -357,27 +351,32 @@ namespace Utilities {
 	*				will be used to interpret the shaders and load them into shader modules
 	*
 	*/
-	inline std::vector<char> ReadFile(const std::string& filename) {
-		std::ifstream file(filename, std::ios::ate | std::ios::binary);
+	inline std::vector<char> ReadFile(const std::string& filename) throw(Exception) {
+		try {
+			std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
-		if (!file.is_open()) {
-			throw std::runtime_error("failed to open file!");
+			if (!file.is_open()) {
+				throw Exception("failed to open file", "Utilities.h", "ReadFile");
+			}
+
+			size_t fileSize = (size_t)file.tellg();
+			std::vector<char> buffer(fileSize);
+
+			file.seekg(0);
+			file.read(buffer.data(), fileSize);
+
+			file.close();
+
+			return buffer;
 		}
-
-		size_t fileSize = (size_t)file.tellg();
-		std::vector<char> buffer(fileSize);
-
-		file.seekg(0);
-		file.read(buffer.data(), fileSize);
-
-		file.close();
-
-		return buffer;
+		catch (Exception &excpt) {
+			throw excpt;
+		}
 	}
 	/*
 	* Function: createShaderModule
 	*
-	* Paramters: const std::vector<char> &code, 
+	* Paramters: const std::vector<char> &code,
 	*				   VkDevice &device
 	*
 	* Return Type: VkShaderModule
@@ -387,18 +386,23 @@ namespace Utilities {
 	*				in the graphics PSO
 	*
 	*/
-	inline VkShaderModule createShaderModule(const std::vector<char> &code, VkDevice &device) {
-		VkShaderModuleCreateInfo createInfo = {};
-		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		createInfo.codeSize = code.size();
-		createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+	inline VkShaderModule createShaderModule(const std::vector<char> &code, VkDevice &device) throw(Exception) {
+		try {
+			VkShaderModuleCreateInfo createInfo = {};
+			createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+			createInfo.codeSize = code.size();
+			createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-		VkShaderModule shaderModule;
-		if (vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create shader module!");
+			VkShaderModule shaderModule;
+			if (vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+				throw Exception("failed to create shader module", "Utilities.h", "createShaderModule");
+			}
+
+			return shaderModule;
 		}
-
-		return shaderModule;
+		catch (Exception &excpt) {
+			throw excpt;
+		}
 	}
 
 	/*
@@ -419,7 +423,7 @@ namespace Utilities {
 	/*
 	* Function: alignedAlloc
 	*
-	* Paramters: size_t size, 
+	* Paramters: size_t size,
 	*			 size_t alignment
 	*
 	* Return Type: void*

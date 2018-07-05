@@ -1,22 +1,68 @@
-/****************************************************************************************
-* TITLE:	VulkanRenderEngine															*
-* BY:		Eric Hollas																	*
-*																						*
-* FILE:		GeometryManager.h															*
-* DETAILS:	This file defines the Geometry Manager object. It will be used to synch		*
-*				vertex data and index data in the render engine.						*
-*				Since the Render Engine uses a dynamic uniform buffer and single		*
-*				index and vertex buffers, this manager will be used in the command		*
-*				buffer, index buffer, and vertex buffer functions in the render			*
-*				engine.	It will also manage loading and deleting the vertex and index	*
-*				data in the CharacterManager object as well.							*
-*																						*
-*****************************************************************************************/
-
+/*
+* TITLE:	VulkanRenderEngine
+* BY:		Eric Hollas
+*
+* FILE:		GeometryManager.h
+* DETAILS:	This file defines the Geometry Manager object. It will be used to synch	
+*				vertex data and index data in the render engine.
+*				Since the Render Engine uses a dynamic uniform buffer and single
+*				index and vertex buffers, this manager will be used in the command	
+*				buffer, index buffer, and vertex buffer functions in the render
+*				engine.	It will also manage loading and deleting the vertex and index
+*				data in the CharacterManager object as well.
+*/
 #pragma once
-#include "stdafx.h"
+
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
+#include <vector>
+#include <array>
 
 namespace Geometry {
+	enum color {
+		white,
+		red,
+		darkRed,
+		brown,
+		darkBrown,
+		green,
+		greenGrass,
+		blue,
+		navy,
+		magenta,
+		yellow,
+		orange,
+		teal,
+		black,
+		darkGray,
+		gray
+	};
+	inline glm::vec3 getColor(color cl) {
+		const std::vector<glm::vec3> color_pallette = {
+			{ 1.0f, 1.0f, 1.0f }, //white
+			{ 1.0f, 0.0f, 0.0f }, //red
+			{ 0.6f, 0.0f, 0.0f }, //darkRed
+			{ 0.5f, 0.3f, 0.0f }, //brown
+			{ 0.3f, 0.2f, 0.0f }, //darkBrown
+			{ 0.0f, 1.0f, 0.0f }, //green
+			{ 0.0f, 0.4f, 0.1f }, //greenGrass
+			{ 0.0f, 0.0f, 1.0f }, //blue
+			{ 0.0f, 0.0f, 0.4f }, //navy
+			{ 1.0f, 0.0f, 1.0f }, //magenta
+			{ 1.0f, 1.0f, 0.0f }, //yellow
+			{ 0.8f, 0.4f, 0.0f }, //orange
+			{ 0.0f, 1.0f, 1.0f }, //teal
+			{ 0.0f, 0.0f, 0.0f }, //black
+			{ 0.2f, 0.2f, 0.2f }, //darkGray
+			{ 0.6f, 0.6f, 0.6f }  //gray
+		};
+		return color_pallette[cl];
+	}
 	struct Vertex {
 		glm::vec3 pos;
 		glm::vec3 color;
@@ -128,8 +174,8 @@ namespace Geometry {
 		/*
 		* Function: updateObject
 		*
-		* Paramters: uint32_t object, 
-		*			 std::vector<Vertex> vertices, 
+		* Paramters: uint32_t object,
+		*			 std::vector<Vertex> vertices,
 		*			 std::vector<uint32_t> indices
 		*
 		* Return Type: void
@@ -155,7 +201,7 @@ namespace Geometry {
 		}
 
 		/*
-		* The following 8 functions are generic accessor methods, but they do compile their necessary 
+		* The following 8 functions are generic accessor methods, but they do compile their necessary
 		*		before returning the data if need be.
 		*
 		*/
@@ -203,13 +249,13 @@ namespace Geometry {
 		std::vector<Geometry::Vertex> getVertices() const {
 			std::vector<Vertex> vertices;
 			std::vector<offset>::const_iterator it = geometryInfo.begin();
-			
+
 			while (it != geometryInfo.end()) {
 				offset temp = *it;
 				vertices.insert(vertices.end(), temp.vertexBuffer.begin(), temp.vertexBuffer.end());
 				it++;
 			}
-			
+
 			return vertices;
 		}
 

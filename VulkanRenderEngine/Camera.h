@@ -1,14 +1,12 @@
-/****************************************************************************************
-* TITLE:	2D-Pong in 3D																*
-* BY:		Eric Hollas																	*
-*																						*
-* FILE:		Camera.h																	*
-* DETAILS:	This file describes the camera object and is made to store the constant		*
-*				uniform buffer data to the shaders. Also, it is made to easily change	*
-*				the values in the Window class for which it will be apart.				*
-*																						*
-*****************************************************************************************/
-
+/*
+* TITLE:	Vulkan Render Engine
+* BY:		Eric Hollas	
+*	
+* FILE:		Camera.h
+* DETAILS:	This file describes the camera object and is made to store the constant
+*				uniform buffer data to the shaders. Also, it is made to easily change
+*				the values in the Window class for which it will be apart.
+*/
 #pragma once
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

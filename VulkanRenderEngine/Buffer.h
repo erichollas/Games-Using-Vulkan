@@ -1,17 +1,15 @@
-/****************************************************************************************
-* TITLE:	2D-Pong in 3D																*
-* BY:		Eric Hollas																	*
-*																						*
-* FILE:		Buffer.h																	*
-* DETAILS:	This file defines the buffer object to be used in several instances in		*
-*				RenderEngine. It is abstracted as an object in this file.				*
-*																						*
-*****************************************************************************************/
-
+/*
+* TITLE:	Vulkan Render Engine
+* BY:		Eric Hollas	
+*
+* FILE:		Buffer.h
+* DETAILS:	This file defines the buffer object to be used in several instances in
+*				RenderEngine. It is abstracted as an object in this file.
+*/
 #pragma once
-
-#include "../../VulkanRenderEngine/RenderEngine/Utilities.h"
-#include "../../VulkanRenderEngine/RenderEngine/InitStructs.h"
+#include "Exception.h"
+#include "Utilities.h"
+#include "InitStructs.h"
 
 namespace vkAPI {
 	namespace Buffer {
@@ -60,15 +58,20 @@ namespace vkAPI {
 			* Description: binds the buffer to its memory
 			*
 			*/
-			void bind(VkDeviceSize offset = 0) {
-				if (vkBindBufferMemory(device, buffer, memory, offset)) {
-					throw std::runtime_error("failed to bind buffer to buffer memory!");
+			void bind(VkDeviceSize offset = 0) throw(Exception) {
+				try {
+					if (vkBindBufferMemory(device, buffer, memory, offset)) {
+						throw Exception("failed to bind buffer to buffer memory", "Buffer.h", "bind");
+					}
+				}
+				catch (Exception &excpt) {
+					throw excpt;
 				}
 			}
 			/*
 			* Function: copyTo
 			*
-			* Paramters: void * pData, 
+			* Paramters: void * pData,
 			*			 VkDeviceSize devSize
 			*
 			* Return Type: void
@@ -155,8 +158,8 @@ namespace vkAPI {
 			/*
 			* Function: createBuffer
 			*
-			* Paramters: VkDeviceSize devSize, 
-			*			 VkBufferUsageFlags usage, 
+			* Paramters: VkDeviceSize devSize,
+			*			 VkBufferUsageFlags usage,
 			*			 VkPhysicalDevice physclDev, VkMemoryPropertyFlags propFlags
 			*
 			* Return Type: VkResult
@@ -164,12 +167,17 @@ namespace vkAPI {
 			* Description: creates the buffer and its memory within the device
 			*
 			*/
-			VkResult createBuffer(VkDeviceSize devSize, VkBufferUsageFlags usage, VkPhysicalDevice physclDev, VkMemoryPropertyFlags propFlags) {
-				if (initBuffer(devSize, usage)) {
-					throw std::runtime_error("vkCreateBuffer function failed!");
+			VkResult createBuffer(VkDeviceSize devSize, VkBufferUsageFlags usage, VkPhysicalDevice physclDev, VkMemoryPropertyFlags propFlags) throw(Exception) {
+				try {
+					if (initBuffer(devSize, usage)) {
+						throw Exception("vkCreateBuffer function failed", "Buffer.h", "createBuffer");
+					}
+					if (initBufferMemory(physclDev, propFlags)) {
+						throw Exception("failed to allocate buffer memory", "Buffer.h", "createBuffer");
+					}
 				}
-				if (initBufferMemory(physclDev, propFlags)) {
-					throw std::runtime_error("failed to allocate buffer memory!");
+				catch (Exception &excpt) {
+					throw excpt;
 				}
 			}
 
@@ -177,7 +185,7 @@ namespace vkAPI {
 			/*
 			* Function: initBuffer
 			*
-			* Paramters: VkDeviceSize devSize, 
+			* Paramters: VkDeviceSize devSize,
 			*			 VkBufferUsageFlags usage
 			*
 			* Return Type: VkResult
@@ -194,7 +202,7 @@ namespace vkAPI {
 			/*
 			* Function: initBufferMemory
 			*
-			* Paramters: VkPhysicalDevice physclDev, 
+			* Paramters: VkPhysicalDevice physclDev,
 			*			 VkMemoryPropertyFlags propFlags
 			*
 			* Return Type: VkResult

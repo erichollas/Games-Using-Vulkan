@@ -1,37 +1,23 @@
-/****************************************************************************************
-* TITLE:	2D-Pong in 3D																*
-* BY:		Eric Hollas																	*
-*																						*
-* FILE:		RenderEngine.h																*
-* DETAILS:	This file defines the render engine object. This uses the Vulkan API to		*
-*				create the object that defines how the game will be rendered to the		*
-*				display.																*
-*			Note: because this file and its corresponding .cpp file are much longer		*
-*				than other files, functions listed in this file are in the same order	*
-*				in the corresponding .cpp file. Also, private functions are grouped		*
-*				and the same order as the class memeber values that they edit.			*
-*																						*
-*****************************************************************************************/
-
 #pragma once
 #include "stdafx.h"
-#include "../../VulkanRenderEngine/RenderEngine/GeometryManager.h"
-#include "../../VulkanRenderEngine/RenderEngine/Camera.h"
-#include "../../VulkanRenderEngine/RenderEngine/Buffer.h"
+#include "Exception.h"
+#include "GeometryManager.h"
+#include "Camera.h"
+#include "Buffer.h"
 
 class RenderEngine {
 public:
-	void initVulkan(GLFWwindow *pW, Geometry::GeometryManager &newManagement);
+	void initVulkan(GLFWwindow *pW, Geometry::GeometryManager &newManagement) throw(Exception);
 	void cleanup();
 
 	void updateUniformBuffer(Camera::UniformBufferObject ubo, std::vector<glm::mat4> uniformMats);
-	void drawFrame();
+	void drawFrame() throw(Exception);
 
-	void updateGeometryBuffers(Geometry::GeometryManager &newManagement);
+	void updateGeometryBuffers(Geometry::GeometryManager &newManagement) throw(Exception);
 
 
 private:
-	GLFWwindow *						 pWindow;
+	GLFWwindow * pWindow;
 	Geometry::GeometryManager *			 pOffsetManager;
 
 	VkInstance							 instance;
@@ -76,45 +62,45 @@ private:
 	std::vector<VkCommandBuffer>		 commandBuffers;
 
 
-	void createInstance();
+	void createInstance() throw(Exception);
 	bool checkValidationLayerSupport();
-	void pickPhysicalDevice();
-	void createLogicalDevice();
+	void pickPhysicalDevice() throw(Exception);
+	void createLogicalDevice() throw(Exception);
 
 	void cleanupSwapchain();
-	void recreateSwapchain();
-	void createSurface();
-	void createSwapchain();
-	void createFramebuffers();
+	void recreateSwapchain() throw(Exception);
+	void createSurface() throw(Exception);
+	void createSwapchain() throw(Exception);
+	void createFramebuffers() throw(Exception);
 
 	void createImage(VkFormat format,
 					 VkImageTiling tiling,
 					 VkImageUsageFlags usage,
 					 VkMemoryPropertyFlags properties,
 					 VkImage& image,
-					 VkDeviceMemory& imageMemory);
+					 VkDeviceMemory& imageMemory) throw(Exception);
 	void createImageViews();
-	VkImageView createView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+	VkImageView createView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) throw(Exception);
+	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) throw(Exception);
 	void createDepthResources();
 	VkCommandBuffer beginSingleTimeCommands();
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-	void createVertexBuffer();
-	void updateVertexBuffer();
-	void createIndexBuffer();
-	void createUniformBuffer();
+	void createVertexBuffer() throw(Exception);
+	void updateVertexBuffer() throw(Exception);
+	void createIndexBuffer() throw(Exception);
+	void createUniformBuffer() throw(Exception);
 
-	void createDescriptorPool();
-	void createDescriptorSet();
-	void createDescriptorSetLayout();
+	void createDescriptorPool() throw(Exception);
+	void createDescriptorSet() throw(Exception);
+	void createDescriptorSetLayout() throw(Exception);
 
-	void createRenderPass();
-	void createGraphicsPipeline();
+	void createRenderPass() throw(Exception);
+	void createGraphicsPipeline() throw(Exception);
 
-	void createSemaphores();
+	void createSemaphores() throw(Exception);
 
-	void createCommandPool();
-	void createCommandBuffers();
+	void createCommandPool() throw(Exception);
+	void createCommandBuffers() throw(Exception);
 };
