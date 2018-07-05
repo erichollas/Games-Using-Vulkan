@@ -1,13 +1,3 @@
-/****************************************************************************************
-* TITLE:	Multi-threaded Minesweeper													*
-* BY:		Eric Hollas																	*
-*																						*
-* FILE:		Window.cpp																	*
-*																						*
-* Correponds to Window.h (see for overall description)									*
-*																						*
-*****************************************************************************************/
-
 #include "stdafx.h"
 #include "Window.h"
 #include "TileGeometry.h"
@@ -32,19 +22,27 @@ clock_t Window::game_time = 0.0f;
 * initializes the GLFWwindow variable
 *
 */
-Window::Window() {
-	pEyeOfTheBeholder = new Camera::pointOfView();
+Window::Window() throw(Exception) {
+	try {
+		pEyeOfTheBeholder = new Camera::pointOfView();
 
-	glfwInit();
+		glfwInit();
 
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-	pWindow = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
+		pWindow = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
+		if (pWindow == NULL) {
+			throw Exception("Failed to create Window", "RenderEngine.cpp", "Window-Constructor");
+		}
 
-	glfwSetKeyCallback(pWindow, keyCallback);
-	glfwSetCursorPosCallback(pWindow, mouse_position_callback);
-	glfwSetInputMode(pWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	glfwSetMouseButtonCallback(pWindow, mouse_click_callback);
+		glfwSetKeyCallback(pWindow, keyCallback);
+		glfwSetCursorPosCallback(pWindow, mouse_position_callback);
+		glfwSetInputMode(pWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		glfwSetMouseButtonCallback(pWindow, mouse_click_callback);
+	}
+	catch (Exception &excpt) {
+		throw excpt;
+	}
 }
 /*
 * Deconstructor
@@ -64,91 +62,96 @@ Window::~Window() {
 * Description: runs the main game loop
 *
 */
-void Window::runGame() {
-	GameBoard = TileManager();
-	GameBoard.setupMines();
+void Window::runGame() throw(Exception) {
+	try {
+		GameBoard = TileManager();
+		GameBoard.setupMines();
 
-	Geometry::GeometryManager offsets = GameBoard.getGeometryInfo();
-	renderer.initVulkan(pWindow, offsets);
+		Geometry::GeometryManager offsets = GameBoard.getGeometryInfo();
+		renderer.initVulkan(pWindow, offsets);
 
-	initCamera();
-	Camera::UniformBufferObject ubo;
-	ubo.proj = pEyeOfTheBeholder->getPerspectiveMatrix();
-	ubo.view = pEyeOfTheBeholder->getLookAtMatrix();
+		initCamera();
+		Camera::UniformBufferObject ubo;
+		ubo.proj = pEyeOfTheBeholder->getPerspectiveMatrix();
+		ubo.view = pEyeOfTheBeholder->getLookAtMatrix();
 
-	int frameCount = 0;	//used to ensure that the timer per game clock() object is called 
-						//twice a second, which will drastically increase performance
-	int nonMineClicks = 0;	//will be used to check if a game has been won
+		int frameCount = 0;	//used to ensure that the timer per game clock() object is called 
+							//twice a second, which will drastically increase performance
+		int nonMineClicks = 0;	//will be used to check if a game has been won
 
-	while (!glfwWindowShouldClose(pWindow)) {
-		bool updateVectors = false;	//will only be true if vector information has changed to ensure that
-									//the vector information will only be sent to the gpu once per loop-cycle
+		while (!glfwWindowShouldClose(pWindow)) {
+			bool updateVectors = false;	//will only be true if vector information has changed to ensure that
+										//the vector information will only be sent to the gpu once per loop-cycle
 
-		timer.startTimer();
-		glfwPollEvents();
+			timer.startTimer();
+			glfwPollEvents();
 
-		//this if statement checks if the clock needs to be updated will a game is being played
-		if (state == playing && frameCount == 0) {
-			clock_t temp_time = clock() - game_time;
-			if (GameBoard.updateTime((((float)temp_time) / CLOCKS_PER_SEC))) {
-				updateVectors = true;
-			}
-		}
-
-		//the first if checks to see if the game needs initializing for a new game or otherwise
-		//	the else if checks to see if a mouse click has happened and needs to be processed
-		if (state == reset) {
-			nonMineClicks = 0;
-			GameBoard.setupMines();
-			updateVectors = true;
-			state = ready;
-		}
-		else if (isMouseDown) {
-			//the first if is for left clicks, the else is for right clicks
-			if (isLeftClick) {
-				bool dataChanged = false;
-				//if checks if a mine was hit
-				if (GameBoard.processLeftClick(PICKER->getVulkanCoordinates().x, PICKER->getVulkanCoordinates().y, dataChanged)) {
-					state = lost;
+			//this if statement checks if the clock needs to be updated will a game is being played
+			if (state == playing && frameCount == 0) {
+				clock_t temp_time = clock() - game_time;
+				if (GameBoard.updateTime((((float)temp_time) / CLOCKS_PER_SEC))) {
 					updateVectors = true;
 				}
-				else if (dataChanged) {
-					updateVectors = true;
-					nonMineClicks++;
-				}
 			}
-			else {
-				GameBoard.processRightClick(PICKER->getVulkanCoordinates().x, PICKER->getVulkanCoordinates().y);
+
+			//the first if checks to see if the game needs initializing for a new game or otherwise
+			//	the else if checks to see if a mouse click has happened and needs to be processed
+			if (state == reset) {
+				nonMineClicks = 0;
+				GameBoard.setupMines();
 				updateVectors = true;
+				state = ready;
 			}
-			isMouseDown = false; // reset to false to ensure one click per cycle is processed
+			else if (isMouseDown) {
+				//the first if is for left clicks, the else is for right clicks
+				if (isLeftClick) {
+					bool dataChanged = false;
+					//if checks if a mine was hit
+					if (GameBoard.processLeftClick(PICKER->getVulkanCoordinates().x, PICKER->getVulkanCoordinates().y, dataChanged)) {
+						state = lost;
+						updateVectors = true;
+					}
+					else if (dataChanged) {
+						updateVectors = true;
+						nonMineClicks++;
+					}
+				}
+				else {
+					GameBoard.processRightClick(PICKER->getVulkanCoordinates().x, PICKER->getVulkanCoordinates().y);
+					updateVectors = true;
+				}
+				isMouseDown = false; // reset to false to ensure one click per cycle is processed
+			}
+
+			//updates the geometry info to the gpu
+			if (updateVectors) {
+				offsets = GameBoard.getGeometryInfo();
+				renderer.updateGeometryBuffers(offsets);
+			}
+
+			//passes the uniform matrices and renders the frame
+			renderer.updateUniformBuffer(ubo, GameBoard.getUniformMatrices());
+			renderer.drawFrame();
+
+			//checks if a game has been won
+			if (nonMineClicks == (GAMEBOARD_ROWS * GAMEBOARD_ROWS) - NUM_OF_MINES) {
+				state = lost;
+			}
+
+			frameCount++;
+			if (frameCount == 500) {
+				frameCount = 0;
+			}
+
+			timer.calcFrameStats();
+			displayFrameStats();
 		}
 
-		//updates the geometry info to the gpu
-		if (updateVectors) {
-			offsets = GameBoard.getGeometryInfo();
-			renderer.updateGeometryBuffers(offsets);
-		}
-
-		//passes the uniform matrices and renders the frame
-		renderer.updateUniformBuffer(ubo, GameBoard.getUniformMatrices());
-		renderer.drawFrame();
-
-		//checks if a game has been won
-		if (nonMineClicks == (GAMEBOARD_ROWS * GAMEBOARD_ROWS) - NUM_OF_MINES) {
-			state = lost;
-		}
-
-		frameCount++;
-		if (frameCount == 500) {
-			frameCount = 0;
-		}
-
-		timer.calcFrameStats();
-		displayFrameStats();
+		renderer.cleanup();
 	}
-
-	renderer.cleanup();
+	catch (Exception &excpt) {
+		throw excpt;
+	}
 }
 
 
@@ -188,7 +191,7 @@ void Window::mouse_position_callback(GLFWwindow *pW, double x_pos, double y_pos)
 * Paramters: standard parameters for the call back function
 *
 *
-* Description: records cursor position when a click occurs in PICKER object, which is of 
+* Description: records cursor position when a click occurs in PICKER object, which is of
 *				type static MouseClickReader*
 *
 */

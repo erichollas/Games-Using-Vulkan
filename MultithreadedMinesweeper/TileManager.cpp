@@ -1,13 +1,3 @@
-/****************************************************************************************
-* TITLE:	Multi-threaded Minesweeper													*
-* BY:		Eric Hollas																	*
-*																						*
-* FILE:		TileManger.cpp																*
-*																						*
-* Correponds to TileManager.h (see for overall description)								*
-*																						*
-*	functions that contain multi-threaded functions begin on lines 41 and 670			*
-*****************************************************************************************/
 #include "stdafx.h"
 #include "TileManager.h"
 
@@ -32,7 +22,7 @@ TileManager::~TileManager() {
 * Return Type: void
 *
 * Description: Several of the multithreaded algorithms are featured in this method.
-*					This mehtod ensures that every member variable is initialized, 
+*					This mehtod ensures that every member variable is initialized,
 *					then randomly generates the mine positions, clalculates the
 *					tiles values as either blank, adjacent to mines, or a mine. Then
 *					makes a function call to initGameboard() to initialize the geometry info.
@@ -56,7 +46,7 @@ void TileManager::setupMines() {
 	int mine_count = 0;
 	int mine_limit = 4;
 	int row = 0;
-	
+
 	//generates a buffer of random numbers to represent how many mines
 	// need to be assigned to each row and ensures that correct total number
 	// of mines are assigned each time.
@@ -118,19 +108,19 @@ void TileManager::setupMines() {
 				switch (row) {
 				case 0:
 					switch (column) {
-					//upper left corner
+						//upper left corner
 					case 0:
 						board[row + 1][column]++;
 						board[row + 1][column + 1]++;
 						board[row][column + 1]++;
 						break;
-					//upper right corner
+						//upper right corner
 					case GAMEBOARD_COLUMNS - 1:
 						board[row + 1][column]++;
 						board[row + 1][column - 1]++;
 						board[row][column - 1]++;
 						break;
-					//upper row
+						//upper row
 					default:
 						board[row + 1][column]++;
 						board[row + 1][column + 1]++;
@@ -142,19 +132,19 @@ void TileManager::setupMines() {
 					break;
 				case GAMEBOARD_ROWS - 1:
 					switch (column) {
-					//bottom left corner
+						//bottom left corner
 					case 0:
 						board[row - 1][column]++;
 						board[row - 1][column + 1]++;
 						board[row][column + 1]++;
 						break;
-					//bottom right corner
+						//bottom right corner
 					case GAMEBOARD_COLUMNS - 1:
 						board[row - 1][column]++;
 						board[row - 1][column - 1]++;
 						board[row][column - 1]++;
 						break;
-					//bottom row
+						//bottom row
 					default:
 						board[row - 1][column - 1]++;
 						board[row - 1][column]++;
@@ -166,7 +156,7 @@ void TileManager::setupMines() {
 					break;
 				default:
 					switch (column) {
-					//left column
+						//left column
 					case 0:
 						board[row - 1][column]++;
 						board[row - 1][column + 1]++;
@@ -174,7 +164,7 @@ void TileManager::setupMines() {
 						board[row + 1][column + 1]++;
 						board[row + 1][column]++;
 						break;
-					//right column
+						//right column
 					case GAMEBOARD_COLUMNS - 1:
 						board[row - 1][column]++;
 						board[row - 1][column - 1]++;
@@ -182,7 +172,7 @@ void TileManager::setupMines() {
 						board[row + 1][column - 1]++;
 						board[row + 1][column]++;
 						break;
-					//not on a side
+						//not on a side
 					default:
 						board[row - 1][column - 1]++;
 						board[row][column - 1]++;
@@ -278,8 +268,8 @@ void TileManager::processRightClick(float x_coord, float y_coord) {
 /*
 * Function: processLeftClick
 *
-* Paramters: float x_coord, 
-*			 float y_coord, 
+* Paramters: float x_coord,
+*			 float y_coord,
 *			 bool &validClick
 *
 * Return Type: bool
@@ -294,7 +284,7 @@ void TileManager::processRightClick(float x_coord, float y_coord) {
 bool TileManager::processLeftClick(float x_coord, float y_coord, bool &validClick) {
 	validClick = false;
 	//this if determines if the click happened on the playbale area
-	if (x_coord < 0.95f && y_coord < (0.78 + TILE_SIZE) && x_coord > (0.95f - (GAMEBOARD_COLUMNS + 1) * (TILE_SIZE + 0.005f)) && y_coord > (0.78f - GAMEBOARD_ROWS * (TILE_SIZE + 0.005f))) {
+	if (x_coord < 0.95f && y_coord < (0.78 + TILE_SIZE) && x_coord >(0.95f - (GAMEBOARD_COLUMNS + 1) * (TILE_SIZE + 0.005f)) && y_coord >(0.78f - GAMEBOARD_ROWS * (TILE_SIZE + 0.005f))) {
 		//row and column and the two following while loops calculate the tile clicked
 		uint32_t row = 0;
 		uint32_t column = 0;
@@ -320,7 +310,7 @@ bool TileManager::processLeftClick(float x_coord, float y_coord, bool &validClic
 					int num = *it;
 					int r = num / GAMEBOARD_COLUMNS;
 					int c = num % GAMEBOARD_COLUMNS;
-					
+
 					//calls revealTile if it is not showing to set the new geometric info
 					if (gameboard_isShowing[r][c] == 0) {
 						gameboard_isShowing[r][c] = 2;
@@ -354,9 +344,9 @@ bool TileManager::processLeftClick(float x_coord, float y_coord, bool &validClic
 * Return Type: bool
 *
 * Description: Updates the timer in the top right of the screen if a second has passed.
-*					If the size of the board changes the indices passed to updateTile 
+*					If the size of the board changes the indices passed to updateTile
 *					need to changed accordingly.
-*				
+*
 *
 */
 bool TileManager::updateTime(int time) {
@@ -379,7 +369,7 @@ bool TileManager::updateTime(int time) {
 }
 
 /*
-* The next two functions are generic accessor functions used to passed 
+* The next two functions are generic accessor functions used to passed
 *		render data to the render engine in the window class
 *
 */
@@ -429,7 +419,7 @@ void TileManager::initGameboard() {
 /*
 * Function: revealTile
 *
-* Paramters: uint8_t row, 
+* Paramters: uint8_t row,
 *			 uint8_t column
 *
 * Return Type: void
@@ -437,7 +427,7 @@ void TileManager::initGameboard() {
 * Description: Uses the parameters to calculate the position of the tile in the pGeometryManager
 *					and to find the correct type of tile to set this tile based on the current value
 *					in the gameboard_values matrix.
-*					Also, here is used an if-else instead of switch because the new geometry must be 
+*					Also, here is used an if-else instead of switch because the new geometry must be
 *					defined locally in each case to update the new tile geometry, which is not allowed
 *					in a switch statement.
 *
@@ -497,13 +487,13 @@ void TileManager::revealTile(uint8_t row, uint8_t column) {
 /*
 * Function: checkBlankPieces
 *
-* Paramters: uint8_t row, 
+* Paramters: uint8_t row,
 *			 uint8_t column
 *
 * Return Type: std::set<int>
 *
 * Description: Uses the passed paramters to find all the adjacent blank tiles
-*				and all tiles adjacent to all the blank tiles to be added to 
+*				and all tiles adjacent to all the blank tiles to be added to
 *				std::set<int> object and then returns the set. Note that a
 *				set object is best here because duplicates would devastate performance
 *
@@ -605,51 +595,51 @@ void TileManager::setupScoreboard() {
 
 	float xPosition = 0.85f;
 	float yPosition = 0.90f;
-	glm::mat4 one_matrix = glm::mat4{	TILE_SIZE,	0.0f,		0.0f,		0.0f,
-										0.0f,		TILE_SIZE,	0.0f,		0.0f,
-										0.0f,		0.0f,		TILE_SIZE,	0.0f,
-										xPosition,	yPosition,	0.0f,		1.0f
-									};
+	glm::mat4 one_matrix = glm::mat4{ TILE_SIZE,	0.0f,		0.0f,		0.0f,
+		0.0f,		TILE_SIZE,	0.0f,		0.0f,
+		0.0f,		0.0f,		TILE_SIZE,	0.0f,
+		xPosition,	yPosition,	0.0f,		1.0f
+	};
 	uniformMatrices.push_back(one_matrix);
 
 	xPosition -= (TILE_SIZE + 0.005f);
-	glm::mat4 two_matrix = glm::mat4{	TILE_SIZE,	0.0f,		0.0f,		0.0f,
-										0.0f,		TILE_SIZE,	0.0f,		0.0f,
-										0.0f,		0.0f,		TILE_SIZE,	0.0f,
-										xPosition,	yPosition,	0.0f,		1.0f
-									};
+	glm::mat4 two_matrix = glm::mat4{ TILE_SIZE,	0.0f,		0.0f,		0.0f,
+		0.0f,		TILE_SIZE,	0.0f,		0.0f,
+		0.0f,		0.0f,		TILE_SIZE,	0.0f,
+		xPosition,	yPosition,	0.0f,		1.0f
+	};
 	uniformMatrices.push_back(two_matrix);
 
 	xPosition -= (TILE_SIZE + 0.005f);
-	glm::mat4 five_matrix = glm::mat4{	TILE_SIZE,	0.0f,		0.0f,		0.0f,
-										0.0f,		TILE_SIZE,	0.0f,		0.0f,
-										0.0f,		0.0f,		TILE_SIZE,	0.0f,
-										xPosition,	yPosition,	0.0f,		1.0f
-									};
+	glm::mat4 five_matrix = glm::mat4{ TILE_SIZE,	0.0f,		0.0f,		0.0f,
+		0.0f,		TILE_SIZE,	0.0f,		0.0f,
+		0.0f,		0.0f,		TILE_SIZE,	0.0f,
+		xPosition,	yPosition,	0.0f,		1.0f
+	};
 	uniformMatrices.push_back(five_matrix);
 
 	xPosition -= (18 * TILE_SIZE);
-	glm::mat4 zero_matrix1 = glm::mat4{	TILE_SIZE,	0.0f,		0.0f,		0.0f,
-										0.0f,		TILE_SIZE,	0.0f,		0.0f,
-										0.0f,		0.0f,		TILE_SIZE,	0.0f,
-										xPosition,	yPosition,	0.0f,		1.0f
-									};
+	glm::mat4 zero_matrix1 = glm::mat4{ TILE_SIZE,	0.0f,		0.0f,		0.0f,
+		0.0f,		TILE_SIZE,	0.0f,		0.0f,
+		0.0f,		0.0f,		TILE_SIZE,	0.0f,
+		xPosition,	yPosition,	0.0f,		1.0f
+	};
 	uniformMatrices.push_back(zero_matrix1);
 
 	xPosition -= (TILE_SIZE + 0.005f);
-	glm::mat4 zero_matrix2 = glm::mat4{	TILE_SIZE,	0.0f,		0.0f,		0.0f,
-										0.0f,		TILE_SIZE,	0.0f,		0.0f,
-										0.0f,		0.0f,		TILE_SIZE,	0.0f,
-										xPosition,	yPosition,	0.0f,		1.0f
-									};
+	glm::mat4 zero_matrix2 = glm::mat4{ TILE_SIZE,	0.0f,		0.0f,		0.0f,
+		0.0f,		TILE_SIZE,	0.0f,		0.0f,
+		0.0f,		0.0f,		TILE_SIZE,	0.0f,
+		xPosition,	yPosition,	0.0f,		1.0f
+	};
 	uniformMatrices.push_back(zero_matrix2);
 
 	xPosition -= (TILE_SIZE + 0.005f);
-	glm::mat4 zero_matrix3 = glm::mat4{	TILE_SIZE,	0.0f,		0.0f,		0.0f,
-										0.0f,		TILE_SIZE,	0.0f,		0.0f,
-										0.0f,		0.0f,		TILE_SIZE,	0.0f,
-										xPosition,	yPosition,	0.0f,		1.0f
-									};
+	glm::mat4 zero_matrix3 = glm::mat4{ TILE_SIZE,	0.0f,		0.0f,		0.0f,
+		0.0f,		TILE_SIZE,	0.0f,		0.0f,
+		0.0f,		0.0f,		TILE_SIZE,	0.0f,
+		xPosition,	yPosition,	0.0f,		1.0f
+	};
 	uniformMatrices.push_back(zero_matrix3);
 }
 /*
@@ -706,7 +696,7 @@ void TileManager::revealMines() {
 * Return Type: void
 *
 * Description: This is to be called when a tile is flagged or un-flagged (right-clicked tile)
-*					This just updates the tiles at the top left of the screen to show how many 
+*					This just updates the tiles at the top left of the screen to show how many
 *					mines are left.
 *				Note that: if the size of the board is changed the values for the indices of the
 *					tiles in the pGeometryManager object must be changed accordingly.
@@ -744,7 +734,7 @@ void TileManager::updateScoreTiles() {
 *
 * Description: Is essentially an overload of the revealTile() method just the tiles
 *					do not correspond to the gameboard_values matrix. Thus the parameters
-*					and the new number to indicate the new geometry info for the tile and 
+*					and the new number to indicate the new geometry info for the tile and
 *					index param is the indice of the tile in the pGeometryManager object.
 *
 */

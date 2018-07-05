@@ -1,17 +1,5 @@
-/****************************************************************************************
-* TITLE:	Multi-threaded Minesweeper													*
-* BY:		Eric Hollas																	*
-*																						*
-* FILE:		TileManager.h																*
-* DETAILS:	This file defines the game logic, the geometry of the tiles, and everything *
-*				in between for the minesweeper game.									*
-*			Multi-threaded functions can be found in the setupMines() and revealMines() *
-*				functions in the corresponding .cpp file.								*
-*																						*
-*****************************************************************************************/
 #pragma once
 #include "stdafx.h"
-#include "../../VulkanRenderEngine/RenderEngine/GeometryManager.h"
 #include "TileGeometry.h"
 
 #define GAMEBOARD_ROWS 24
