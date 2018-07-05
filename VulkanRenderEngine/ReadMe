@@ -9,3 +9,5 @@ The Buffer.h defines a buffer with all its possible associated data and will use
 The RenderEngine.h and RenderEngine.cpp files of course contain the definitions used to define the Render Engine.
 
 The GeometryManager is an object that is used to store vertices, indices, and the offset information for each objects offsets within the Vertex and Index Buffers. This will be used to instance draw each object within the buffers once in the command buffer creation within the RenderEngine.cpp file (the command buffers method is the last method defined in the RenderEngine.cpp file).
+
+updated, July 5, 2018: Added a basic Exception object. This will throw more detailed exceptions about where the exception was thrown from.
