@@ -6,3 +6,5 @@ Another game that implements the same VulkanRenderEngine. Classical Minesweeper 
 
 VulkanRenderEngine--
 A render engine implemented using the Vulkan API. The goal for this is re-usability, which can be seen in the GeometryManager object. The GeometryManager manages the offsets of the vertices and indices of the various objects to be easily coordinated with the command buffer in the RenderEngine object, and serves as the main interface between game instance and render engine. (an exercies in graphics API's and writing re-usable programs)
+
+Note that the GeometryManager class is not a singleton class. It simple gathers together the geometric info used to render objects.
