@@ -25,16 +25,24 @@ int Window::user_id = -1;
 * initializes the GLFWwindow variable
 *
 */
-Window::Window() {
-	pEyeOfTheBeholder = new Camera::pointOfView();
+Window::Window() throw(Exception) {
+	try{
+		pEyeOfTheBeholder = new Camera::pointOfView();
 
-	glfwInit();
+		glfwInit();
 
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-	pWindow = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
+		pWindow = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
+		if(pWindow == NULL){
+			throw Exception("Failed to create window", "Window.cpp", "Window-Constructor");
+		}
 
-	glfwSetKeyCallback(pWindow, keyCallback);
+		glfwSetKeyCallback(pWindow, keyCallback);
+	}
+	catch(Exception &excpt){
+		throw excpt;
+	}
 }
 /*
 * Deconstructor
@@ -55,33 +63,38 @@ Window::~Window() {
 *
 */
 void Window::runGame() {
-	initCharacters();
-	renderer.initVulkan(pWindow, *CharacterList.getOffsets());
-	initCamera();
-	Camera::UniformBufferObject ubo;
-	ubo.proj = pEyeOfTheBeholder->getPerspectiveMatrix();
-	ubo.view = pEyeOfTheBeholder->getLookAtMatrix();
+	try{
+		initCharacters();
+		renderer.initVulkan(pWindow, *CharacterList.getOffsets());
+		initCamera();
+		Camera::UniformBufferObject ubo;
+		ubo.proj = pEyeOfTheBeholder->getPerspectiveMatrix();
+		ubo.view = pEyeOfTheBeholder->getLookAtMatrix();
 
-	while (!glfwWindowShouldClose(pWindow)) {
-		glfwPollEvents();
+		while (!glfwWindowShouldClose(pWindow)) {
+			glfwPollEvents();
 
-		timer.startTimer();
+			timer.startTimer();
 
-		bool updateOffsets = CharacterList.runFSMs();
+			bool updateOffsets = CharacterList.runFSMs();
 
-		if (updateOffsets) {
-			CharacterList.updateOffsets();
-			renderer.updateGeometryBuffers(*CharacterList.getOffsets());
+			if (updateOffsets) {
+				CharacterList.updateOffsets();
+				renderer.updateGeometryBuffers(*CharacterList.getOffsets());
+			}
+
+			renderer.updateUniformBuffer(ubo, CharacterList.getUniformMatrices());
+			renderer.drawFrame();
+
+			timer.calcFrameStats();
+			displayFrameStats();
 		}
 
-		renderer.updateUniformBuffer(ubo, CharacterList.getUniformMatrices());
-		renderer.drawFrame();
-
-		timer.calcFrameStats();
-		displayFrameStats();
+		renderer.cleanup();
 	}
-
-	renderer.cleanup();
+	catch(Exception &excpt){
+		throw excpt;
+	}
 }
 
 
