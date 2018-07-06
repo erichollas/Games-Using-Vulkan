@@ -1,3 +1,10 @@
+/*
+* TITLE:	Multi-threaded Minesweeper
+* BY:		Eric Hollas
+*	
+* FILE:		main.cpp
+* DETAILS:	This file creates and calls the object to run the game						*
+*/
 #include "stdafx.h"
 #include "Window.h"
 #include "Exception.h"

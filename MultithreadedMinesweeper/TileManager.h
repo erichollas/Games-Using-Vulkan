@@ -1,3 +1,13 @@
+/*
+* TITLE:	Multi-threaded Minesweeper
+* BY:		Eric Hollas	
+*	
+* FILE:		TileManager.h
+* DETAILS:	This file defines the object that manages each and every tile that is
+*				part of the game board. All of the clicks are processed in this class
+*				and all of the initialiazations are processed in this clas.
+*/
+
 #pragma once
 #include "stdafx.h"
 #include "TileGeometry.h"

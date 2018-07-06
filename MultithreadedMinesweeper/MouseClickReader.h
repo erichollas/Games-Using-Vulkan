@@ -1,3 +1,12 @@
+/*
+* TITLE:	Multi-threaded Minesweeper
+* BY:		Eric Hollas
+*	
+* FILE:		MouseClickReader.h	
+* DETAILS:	This file defines the instance object that takes in the mouse coordinates
+*				of a click and then converts them to vulkan coordinates to be used later
+*/
+
 #ifndef _MOUSECLICKREADER_H_
 #define _MOUSECLICKREADER_H_
 

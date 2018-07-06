@@ -1,3 +1,19 @@
+/*
+* TITLE:	Multi-threaded Minesweeper
+* BY:		Eric Hollas
+*
+* FILE:		TileGeometry.h	
+* DETAILS:	This file defines the geometric data used for each tile. Each tile will
+*				inherit from the BaseTileGeometry virtual class. Each object will only
+*				define the pure virtual function initMesh() to initialize the geometric
+*				data used for renderring each tile.	
+*			Each object is named consistently, there will be a tile for blank tile, an
+*				unclicked tile, a tile for a mine clicked on and a mine reveal, a tile
+*				that is flagged as a potential mine, and a tile for each number 0-9.
+*			The mine image is that of the "nuclear symbol" its geometry info is several
+*				tessellated circles.
+*/
+
 #pragma once
 #include "stdafx.h"
 #include "GeometryManager.h"
