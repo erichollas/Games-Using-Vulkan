@@ -23,10 +23,10 @@
 
 class Window {
 public:
-	Window();
+	Window() throw(Exception);
 	~Window();
 
-	void runGame();
+	void runGame() throw(Exception);
 
 	static void keyCallback(GLFWwindow *pW, int key, int scancode, int action, int mods);
 
