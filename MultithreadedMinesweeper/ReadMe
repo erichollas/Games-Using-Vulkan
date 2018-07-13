@@ -5,7 +5,7 @@ Multi-threaded code locations:
 
 In the TileManager.h file starting on line 67 is the callable object to assign mines to tiles and is implemented in the TileManager.cpp file starting on line 72 and will done by line 90.
 
-In the TileManager.cpp file starting on line 100 is the lambda defing to label tiles with the number of adjacent mine tiles. and is implemented thereafter. This method defines a lambda and runs the lambda on multiple threads immediately after. This multi-threaded algorithm will be done by line 212. The length in code is from the switch statment, which is not a complicated switch, just long.
+In the TileManager.cpp file starting on line 100 is the lambda defining to label tiles with the number of adjacent mine tiles and is implemented thereafter. This method defines a lambda and runs that lambda on multiple threads immediately after. This multi-threaded algorithm will be done by line 212. The length in code is from the switch statment, which is not a complicated switch, just long-ish.
 
 In the TileManager.cpp file starting on line 660 is the private method used to reveal all mines when a player has clicked on a mine. This method defines a lambda and runs the lambda on multiple threads immediately after. This multi-threaded algorithm will be done by line 690.
 
